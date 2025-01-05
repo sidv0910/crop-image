@@ -4,7 +4,8 @@ import time
 import shutil
 import glob
 import boto3
-from zipfile import ZipFile
+import pathlib
+# from zipfile import ZipFile
 from PIL import Image, ImageOps
 
 
@@ -45,7 +46,16 @@ def createZipFile(directory, zip_file):
 
 def uploadToS3Bucket(directory, zip_file):
     client = boto3.client(s3, region_name=region)
-    client.upload_file(os.path.join(directory, zip_file), s3_bucket, zip_file)
+    if zip_file.endswith(jpg_extension) or zip_file.endswith(jpeg_extension):
+        client.upload_file(os.path.join(directory, zip_file), s3_bucket, zip_file, ExtraArgs={
+            'ContentType': 'image/jpeg'
+        })
+    elif zip_file.endswith(png_extension):
+        client.upload_file(os.path.join(directory, zip_file), s3_bucket, zip_file, ExtraArgs={
+            'ContentType': 'image/png'
+        })
+    else:
+        client.upload_file(os.path.join(directory, zip_file), s3_bucket, zip_file)
 
 
 def deleteSubDirectories(directory):
@@ -56,8 +66,9 @@ def deleteSubDirectories(directory):
 
 
 class ImageCrop:
-    def __init__(self, files):
+    def __init__(self, files, filetype):
         self.files = files
+        self.filetype = filetype
 
     def cropImages(self):
         number_of_files = len(self.files)
@@ -65,8 +76,8 @@ class ImageCrop:
         if number_of_files == 1:
             if file_extension in image_extensions:
                 return self.cropImagesForSingleImage()
-            else:
-                return self.cropImagesForSingleZipFile()
+            # else:
+            #     return self.cropImagesForSingleZipFile()
         else:
             if file_extension in image_extensions:
                 return self.cropImagesForMultipleImages()
@@ -79,9 +90,14 @@ class ImageCrop:
         os.makedirs(directory)
 
         cropped_image = cropImage(self.files[0])
-        cropped_image.save(os.path.join(directory, self.files[0].name))
 
-        createZipFile(directory, zip_file)
+        if self.filetype:
+            zip_file = directory + pathlib.Path(self.files[0].name).suffix
+            cropped_image.save(os.path.join(directory, zip_file))
+        else:
+            cropped_image.save(os.path.join(directory, self.files[0].name))
+            createZipFile(directory, zip_file)
+
         uploadToS3Bucket(directory, zip_file)
 
         shutil.rmtree(directory)
@@ -102,24 +118,24 @@ class ImageCrop:
         shutil.rmtree(directory)
         return s3_url + zip_file
 
-    def cropImagesForSingleZipFile(self):
-        directory = getDirectory()
-        zipfile_name = directory + zipfile_extension
-        os.makedirs(directory)
-
-        zip_file = self.files[0]
-        with ZipFile(zip_file, 'r') as zipfile_object:
-            zipfile_object.extractall(path=directory)
-
-            for file in zipfile_object.namelist():
-                if (not file.startswith(macosx)) and (file.endswith(jpg_extension) or file.endswith(jpeg_extension)
-                                                          or file.endswith(png_extension)):
-                    cropped_image = cropImage(os.path.join(directory, file))
-                    cropped_image.save(os.path.join(directory, os.path.basename(file)))
-
-        deleteSubDirectories(directory)
-        createZipFile(directory, zipfile_name)
-        uploadToS3Bucket(directory, zipfile_name)
-
-        shutil.rmtree(directory)
-        return s3_url + zipfile_name
+    # def cropImagesForSingleZipFile(self):
+    #     directory = getDirectory()
+    #     zipfile_name = directory + zipfile_extension
+    #     os.makedirs(directory)
+    #
+    #     zip_file = self.files[0]
+    #     with ZipFile(zip_file, 'r') as zipfile_object:
+    #         zipfile_object.extractall(path=directory)
+    #
+    #         for file in zipfile_object.namelist():
+    #             if (not file.startswith(macosx)) and (file.endswith(jpg_extension) or file.endswith(jpeg_extension)
+    #                                                       or file.endswith(png_extension)):
+    #                 cropped_image = cropImage(os.path.join(directory, file))
+    #                 cropped_image.save(os.path.join(directory, os.path.basename(file)))
+    #
+    #     deleteSubDirectories(directory)
+    #     createZipFile(directory, zipfile_name)
+    #     uploadToS3Bucket(directory, zipfile_name)
+    #
+    #     shutil.rmtree(directory)
+    #     return s3_url + zipfile_name

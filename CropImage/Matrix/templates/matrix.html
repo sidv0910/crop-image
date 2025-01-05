@@ -1,0 +1,94 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Matrix</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" type="image/png" href="{% static 'images/Logo.png' %}">
+    <link rel="stylesheet" href="{% static 'css/matrix.css' %}">
+    <script src="{% static 'js/matrix.js' %}"></script>
+  </head>
+  <body onload="setup()">
+    <nav class="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="/">
+          <img src="{% static 'images/Contour.png' %}" alt="Logo" width="250" height="35" class="d-inline-block align-text-top">
+        </a>
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link active" href="/matrix">Matrix</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" aria-current="page" href="/crop">Crop Image</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <br>
+    <h1>Matrix</h1>
+    <br>
+    <div class="form">
+      <form action="{% url 'Matrix' %}" onsubmit="return validateForm();" method="post" class="upload-form" id="upload-form" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.subject }}
+        <div class="dropdown">
+          <button class="btn btn-outline-danger dropdown-toggle" type="button" id="subjectMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+            <span id="subjectMenuButtonText">
+          {% if output %}
+            {{ subject }}
+          {% else %}
+            Subject
+          {% endif %}
+            </span>
+            <i class="fa fa-caret-down"></i>
+          </button>
+          <ul class="dropdown-menu" aria-labelledby="subjectMenuButton" id="subjectDropdownMenu">
+            {% for subject in subjects %}
+              <li class="dropdown-item subject-dropdown-item">{{ subject }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+        {{ form.bookletType }}
+        <div class="dropdown">
+          <button class="btn btn-outline-primary dropdown-toggle" type="button" id="bookletTypeMenuButton" data-bs-toggle="dropdown" aria-expanded="false" {% if output and subject == "UCAT" %}disabled="true"{% endif %}>
+            <span id="bookletTypeMenuButtonText">
+          {% if output %}
+            {{ booklet_type }}
+          {% else %}
+            Booklet Type
+          {% endif %}
+            </span>
+            <i class="fa fa-caret-down"></i>
+          </button>
+          <ul class="dropdown-menu" aria-labelledby="bookletTypeMenuButton" id="bookletTypeDropdownMenu">
+            {% for booklet_type in booklet_types %}
+              <li class="dropdown-item booklet-type-dropdown-item">{{ booklet_type }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+        <div class="submitButton">
+          <input type="submit" value="Submit" class="submit-button" id="submit-button">
+        </div>
+      </form>
+    </div>
+    {% if output %}
+      <br><br>
+      <center>
+      <ul class="list-group">
+        <li class="list-group-item list-group-item-dark" style="text-align: center; border-bottom: 1px solid black;"><h5>{{ subject }} {{ booklet_type }}</h5></li>
+        {% for i in instruction %}
+          <li class="list-group-item {% cycle 'list-group-item-warning' 'list-group-item-danger' %}"><table><tr><td><input type="checkbox" id="instruction{{ forloop.counter }}"></td><td><label class="value" id="label{{ forloop.counter }}">{{ i|linebreaksbr }}</label></td></tr></table></li>
+        {% endfor %}
+      </ul>
+      </center>
+      <br>
+      <h5><span id="time"></span></h5>
+      <br>
+    {% endif %}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  </body>
+</html>

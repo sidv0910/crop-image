@@ -3,23 +3,23 @@ from .forms import FileUploadForm
 from .ImageCrop import ImageCrop
 
 
-def home(request):
-    form = FileUploadForm()
-    return render(request, 'home.html', {'form': form})
-
-
-def custom_404(request, exception):
-    return render(request, '404.html', status=404)
-
-
 def cropImage(request):
     if request.method == "POST":
         files = request.FILES.getlist('file')
-        cropper = ImageCrop(files)
+        filetype = request.POST.get('type')
+        if filetype == 'True' or filetype == 'False':
+            filetype = eval(filetype)
+        else:
+            pass
+        cropper = ImageCrop(files, filetype)
         s3_url = cropper.cropImages()
         status = False
         if s3_url.startswith('https://'):
             status = True
-        return render(request, 'download.html', {'url': s3_url, 'status': status})
+        if filetype and status:
+            return redirect(s3_url)
+        else:
+            return render(request, 'download.html', {'url': s3_url, 'status': status})
     else:
-        return redirect(home)
+        form = FileUploadForm()
+        return render(request, 'crop.html', {'form': form})

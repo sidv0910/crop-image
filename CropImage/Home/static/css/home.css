@@ -2,17 +2,7 @@ body {
     text-align: center;
 }
 
-.upload-form {
-    width: 50%;
-    display: inline-block;
-}
-
-input[type="file"] {
-    display: none;
-}
-
-.submit-button {
-    background-color: #4CAF50;
+input {
     border: none;
     border-radius: 8px;
     color: white;
@@ -26,6 +16,14 @@ input[type="file"] {
     cursor: pointer;
 }
 
-.submit-button:hover {
+.matrix-button {
+    background-color: #FFCC66;
+}
+
+.crop-image-button {
+    background-color: #CC66FF;
+}
+
+.matrix-button:hover, .crop-image-button:hover {
     background-color: #555555;
 }

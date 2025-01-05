@@ -7,15 +7,23 @@
     <title>Crop Image</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
     <link rel="icon" type="image/png" href="{% static 'images/Logo.png' %}">
-    <link rel="stylesheet" href="{% static 'css/home.css' %}">
-    <script src="{% static 'js/script.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/crop.css' %}">
+    <script src="{% static 'js/crop.js' %}"></script>
   </head>
   <body onload="setup()">
-    <nav class="navbar bg-body-tertiary" data-bs-theme="dark">
+    <nav class="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
       <div class="container-fluid">
         <a class="navbar-brand" href="/">
           <img src="{% static 'images/Contour.png' %}" alt="Logo" width="250" height="35" class="d-inline-block align-text-top">
         </a>
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/matrix">Matrix</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="/crop">Crop Image</a>
+          </li>
+        </ul>
       </div>
     </nav>
     <br>
@@ -24,13 +32,14 @@
     <form action="{% url 'Crop Image' %}" method="post" class="upload-form" id="upload-form" enctype="multipart/form-data">
       {% csrf_token %}
       {{ form.file }}
+      {{ form.type }}
       <input type="submit" value="Select Files" class="submit-button" id="submit-button">
     </form>
     <div class="spinner-border" style="width: 4rem; height: 4rem; display:none;" role="status" id="spinner-border">
       <span class="sr-only"></span>
     </div>
     <br> <br>
-    <h6>Allowed File Formats: .zip, .jpeg, .jpg, .png</h6>
+    <h6>Allowed File Formats: .jpeg, .jpg, .png</h6>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
   </body>
 </html>

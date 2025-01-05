@@ -7,6 +7,15 @@ function setup() {
 
     document.getElementById('formFile').addEventListener('change', submitForm);
 
+    window.addEventListener('paste', (e) => {
+        document.getElementById('formFile').files = e.clipboardData.files;
+        if (e.clipboardData.files.length == 1) {
+            document.getElementById('formType').value = 'True';
+        }
+        console.log(document.getElementById('formType').value);
+        document.getElementById('formFile').dispatchEvent(new Event('change'));
+    });
+
     function submitForm() {
         if (validateForm()) {
             updateDisplay();

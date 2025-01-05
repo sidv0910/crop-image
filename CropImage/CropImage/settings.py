@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
-
+import os.path
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -37,7 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'Home',
     'ImageCropper',
+    'Matrix',
 ]
 
 MIDDLEWARE = [
@@ -55,7 +57,11 @@ ROOT_URLCONF = 'CropImage.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'Home/templates'),
+            os.path.join(BASE_DIR, 'ImageCropper/templates'),
+            os.path.join(BASE_DIR, 'Matrix/templates'),
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
